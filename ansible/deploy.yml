@@ -1,0 +1,21 @@
+- name: Deploy redmine
+  hosts: all
+  serial: 1
+  tasks:
+    - name: create environment variables from template
+      tags: deploy
+      ansible.builtin.template:
+        src: environment.j2
+        dest: /var/tmp/redmine.env
+
+    - name: run container
+      tags: deploy
+      community.docker.docker_container:
+        name: redmine
+        image: redmine:latest
+        env_file: /var/tmp/redmine.env
+        state: started
+        recreate: true
+        restart_policy: unless-stopped
+        ports:
+          - 8080:3000

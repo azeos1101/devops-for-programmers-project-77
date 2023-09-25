@@ -1,0 +1,15 @@
+- name: Setup packages
+  hosts: all
+  tasks:
+    - name: update packages cache
+      tags: setup
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install pip and packages
+      tags: setup
+      include_role:
+        name: geerlingguy.pip
+      vars:
+        pip_install_packages:
+          - docker

@@ -1,0 +1,8 @@
+- name: Setting up Datadog agent
+  hosts: webservers
+  tasks:
+    - name: Import the Datadog Agent role from the Datadog collection
+      tags: datadog
+      import_role:
+        name: datadog.datadog
+

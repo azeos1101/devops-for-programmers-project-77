@@ -21,7 +21,7 @@ terra_run: terra_decrypt
 	terraform $(terraform_path) apply -auto-approve
 	terraform $(terraform_path) output -raw webservers_yml > ./ansible/webservers.yml
 	terraform $(terraform_path) output -raw db_yml > ./ansible/group_vars/webservers/db.yml
-	ansible-vault encrypt $(vault_decrypt) ./ansible/group_vars/webservers/db.yml
+	ansible-vault encrypt --vault-password-file password_file ./ansible/group_vars/webservers/db.yml
 	$(MAKE) terra_encrypt
 
 # Ansible

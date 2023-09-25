@@ -1,0 +1,9 @@
+- ansible.builtin.import_playbook: setup_packages.yml
+
+- ansible.builtin.import_playbook: deploy.yml
+
+- ansible.builtin.import_playbook: datadog.yml
+
+
+
+
