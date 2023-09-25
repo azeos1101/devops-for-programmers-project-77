@@ -57,24 +57,46 @@ resource "digitalocean_database_firewall" "terra-db-fw" {
   }
 }
 
+resource "digitalocean_domain" "default" {
+  name       = var.domain_name
+  ip_address = digitalocean_loadbalancer.loadbalancer.ip
+}
+
+resource "digitalocean_certificate" "cert" {
+  name    = "le-terra-cert"
+  type    = "lets_encrypt"
+  domains = [var.domain_name]
+}
+
+resource "digitalocean_record" "CNAME-www" {
+  domain = digitalocean_domain.default.name
+  type = "CNAME"
+  name = "www"
+  value = "@"
+}
+
+
 resource "digitalocean_loadbalancer" "loadbalancer" {
   name   = "lb-1"
   region = "ams3"
+  droplet_tag = "web"
+  redirect_http_to_https = true
 
   forwarding_rule {
-    entry_port     = 80
-    entry_protocol = "http"
+    entry_port     = 443
+    entry_protocol = "https"
 
     target_port     = 8080
     target_protocol = "http"
+
+    certificate_name = digitalocean_certificate.cert.name
   }
 
   healthcheck {
-    port     = 22
+    port     = 8080
     protocol = "tcp"
   }
 
-  droplet_tag = "web"
 }
 
 # Export data for external tools
