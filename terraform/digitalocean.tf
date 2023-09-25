@@ -20,32 +20,21 @@ resource "digitalocean_project" "hexlet-project-3" {
   description = "Hexlet Terraform project"
   purpose     = "Web Application"
   environment = "Production"
-  resources   = [
-    digitalocean_droplet.terra-web-1.urn,
-    digitalocean_droplet.terra-web-2.urn,
+  resources   = flatten([
+    digitalocean_droplet.terra-web-server.*.urn,
     digitalocean_database_cluster.terra-db-1.urn,
     digitalocean_loadbalancer.loadbalancer.urn
-  ]
+  ])
 }
 
-resource "digitalocean_droplet" "terra-web-1" {
+resource "digitalocean_droplet" "terra-web-server" {
+  count = 2
   image  = "ubuntu-22-04-x64"
-  name   = "terra-web-1"
+  name   = "terra-web-0${count.index + 1}"
   region = "ams3"
   size   = "s-1vcpu-1gb"
   tags   = ["web"]
   ssh_keys = [data.digitalocean_ssh_key.main.id]
-  user_data = data.template_file.db_connection.rendered
-}
-
-resource "digitalocean_droplet" "terra-web-2" {
-  image  = "ubuntu-22-04-x64"
-  name   = "terra-web-2"
-  region = "ams3"
-  size   = "s-1vcpu-1gb"
-  tags   = ["web"]
-  ssh_keys = [data.digitalocean_ssh_key.main.id]
-  user_data = data.template_file.db_connection.rendered
 }
 
 resource "digitalocean_database_cluster" "terra-db-1" {
@@ -87,18 +76,33 @@ resource "digitalocean_loadbalancer" "loadbalancer" {
   droplet_tag = "web"
 }
 
-data "template_file" "db_connection" {
-  template = "${file("${path.module}/templates/db.tpl")}"
-  vars = {
-    db_type="postgres"
-    database="${data.digitalocean_database_cluster.terra-db-data.database}"
-    host="${data.digitalocean_database_cluster.terra-db-data.private_host}"
-    port="${data.digitalocean_database_cluster.terra-db-data.port}"
-    user="${data.digitalocean_database_cluster.terra-db-data.user}"
-    password="${data.digitalocean_database_cluster.terra-db-data.password}"
+# Export data for external tools
+data "digitalocean_droplets" "webservers" {
+  filter {
+    key = "tags"
+    values = ["web"]
   }
+
+  depends_on = [digitalocean_droplet.terra-web-server]
 }
 
 data "digitalocean_database_cluster" "terra-db-data" {
   name = "terra-db-1"
+  depends_on = [digitalocean_database_cluster.terra-db-1]
+}
+
+output "webservers_yml" {
+  value = templatefile(
+    "${path.module}/templates/webservers.yml.tftpl",
+    { ipv4_address = data.digitalocean_droplets.webservers.droplets.*.ipv4_address }
+  )
+  sensitive = true
+}
+
+output "db_yml" {
+  value = templatefile(
+    "${path.module}/templates/db.yml.tftpl",
+    { db_cluster = data.digitalocean_database_cluster.terra-db-data }
+  )
+  sensitive = true
 }

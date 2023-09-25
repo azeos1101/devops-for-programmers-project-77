@@ -1,0 +1,9 @@
+---
+webservers:
+  hosts:
+  %{ for idx, ipv4 in ipv4_address }
+    web${idx + 1}:
+      ansible_host: ${ipv4}
+      ansible_user: root
+  %{ endfor }
+
