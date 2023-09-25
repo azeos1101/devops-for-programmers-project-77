@@ -35,6 +35,7 @@ resource "digitalocean_droplet" "terra-web-server" {
   size   = "s-1vcpu-1gb"
   tags   = ["web"]
   ssh_keys = [data.digitalocean_ssh_key.main.id]
+  user_data = templatefile("${path.module}/templates/droplet_init.tftpl",{})
 }
 
 resource "digitalocean_database_cluster" "terra-db-1" {

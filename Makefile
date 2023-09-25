@@ -1,10 +1,9 @@
 terraform_path := -chdir=./terraform
 ansible_path := ./ansible
 inventory_path := $(ansible_path)/webservers.yml
-playbook_path := $(ansible_path)/webservers.yml
+playbook_path := $(ansible_path)/playbook.yml
 vault_decrypt := --vault-password-file password_file
 vault_file := vault.yml
-
 
 # Terraform
 terra_encrypt:
@@ -13,29 +12,17 @@ terra_encrypt:
 terra_decrypt:
 	ansible-vault decrypt $(vault_decrypt) ./terraform/vars.auto.tfvars
 
-terra_init: terra_decrypt
-	terraform $(terraform_path) init
-	$(MAKE) terra_encrypt
-
-terra_apply: terra_decrypt
-	terraform $(terraform_path) apply -auto-approve
-	$(MAKE) terra_encrypt
-
-terra_webservers: terra_decrypt
-	terraform $(terraform_path) output -raw webservers_yml > ./ansible/webservers.yml
-	$(MAKE) terra_encrypt
-
-terra_db_config: terra_decrypt
-	terraform $(terraform_path) output -raw db_yml > ./ansible/group_vars/webservers/db.yml
-	$(MAKE) terra_encrypt
-
 terra_plan: terra_decrypt
 	terraform $(terraform_path) plan
 	$(MAKE) terra_encrypt
 
-
-
-terra_run: terra_apply terra_webservers
+terra_run: terra_decrypt
+	terraform $(terraform_path) init
+	terraform $(terraform_path) apply -auto-approve
+	terraform $(terraform_path) output -raw webservers_yml > ./ansible/webservers.yml
+	terraform $(terraform_path) output -raw db_yml > ./ansible/group_vars/webservers/db.yml
+	ansible-vault encrypt $(vault_decrypt) ./ansible/group_vars/webservers/db.yml
+	$(MAKE) terra_encrypt
 
 # Ansible
 # Local tools
