@@ -1,7 +1,6 @@
 inventory_path := ./inventory/webservers.yml
 vault_decrypt := --vault-password-file ../password_file
-vault_file := vault.yml
-
+vault_file := ./group_vars/webservers/vault.yml
 
 # Ansible
 # Local tools
