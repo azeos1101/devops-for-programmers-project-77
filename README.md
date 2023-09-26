@@ -9,9 +9,18 @@
 Мониторинг настроил на сервисе Pingdom
 
 
+## Секреты
+Для запуска проекта необходимо положить файл `password_file` в корневую директорию проекта
+Файл `secret.auto.tfvars` в директорию `terrafrom`.
+`secret` должен содержать следующие переменные:
+```ruby
+do_token        = "dop_v1_some_token"
+datadog_api_key = "some_api_token"
+datadog_app_key = "some_app_token"
+```
+
 ## Разворачивание системы
 Для запуска проекта необходимо положить файл `password_file` в корневую директорию проекта,
-`secret.auto.tfvars` в директорию `terrafrom` и выполнить команды:
 ```bash
 # Установить зависимости Terraform, развернуть инфраструктуру, выполнить инициализацию инфраструктуры
 # Процесс обновления и установки пакетов на новые сервера может занять долгое время.
@@ -30,7 +39,10 @@ make ansible_run
 # Автоформатирование конфига Terraform
 make terra_format
 
-# Json c полной конфигурацией inventory
+# Запуск планирования Terraform без применения
+make terra_plan
+
+# Json c полной конфигурацией inventory для Ansible
 make inventory_list
 
 # ping всех хостов из inventory

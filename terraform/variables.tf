@@ -3,18 +3,28 @@ variable "do_token" {
   sensitive = true
 }
 
-variable "domain_name" {
+variable "do_region" {
+  type = string
+}
+
+variable "do_webserver_tag" {
   type = string
 }
 
 variable "datadog_api_key" {
-  type = string
+  type      = string
+  sensitive = true
 }
 
 variable "datadog_app_key" {
-  type = string
-
+  type      = string
+  sensitive = true
 }
+
 variable "datadog_api_url" {
+  type = string
+}
+
+variable "domain_name" {
   type = string
 }

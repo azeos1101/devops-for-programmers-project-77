@@ -20,12 +20,12 @@ resource "digitalocean_project" "hexlet-project-3" {
 }
 
 resource "digitalocean_droplet" "terra-web-server" {
-  count     = 2
+  count     = 3
   image     = "ubuntu-22-04-x64"
   name      = "terra-web-0${count.index + 1}"
-  region    = "ams3"
+  region    = var.do_region
   size      = "s-1vcpu-1gb"
-  tags      = ["web"]
+  tags      = [var.do_webserver_tag]
   ssh_keys  = [data.digitalocean_ssh_key.main.id]
   user_data = templatefile("${path.module}/templates/droplet_init.tftpl", {})
 }
@@ -35,7 +35,7 @@ resource "digitalocean_database_cluster" "terra-db-1" {
   engine     = "pg"
   version    = "15"
   size       = "db-s-1vcpu-1gb"
-  region     = "ams3"
+  region     = var.do_region
   node_count = 1
   tags       = ["db"]
 }
@@ -45,7 +45,7 @@ resource "digitalocean_database_firewall" "terra-db-fw" {
 
   rule {
     type  = "tag"
-    value = "web"
+    value = var.do_webserver_tag
   }
 }
 
@@ -70,8 +70,8 @@ resource "digitalocean_record" "CNAME-www" {
 
 resource "digitalocean_loadbalancer" "loadbalancer" {
   name                   = "lb-1"
-  region                 = "ams3"
-  droplet_tag            = "web"
+  region                 = var.do_region
+  droplet_tag            = var.do_webserver_tag
   redirect_http_to_https = true
 
   forwarding_rule {
@@ -92,24 +92,11 @@ resource "digitalocean_loadbalancer" "loadbalancer" {
 }
 
 # Export data for external tools
-data "digitalocean_droplets" "webservers" {
-  filter {
-    key    = "tags"
-    values = ["web"]
-  }
-
-  depends_on = [digitalocean_droplet.terra-web-server]
-}
-
-data "digitalocean_database_cluster" "terra-db-data" {
-  name       = "terra-db-1"
-  depends_on = [digitalocean_database_cluster.terra-db-1]
-}
 
 output "webservers_yml" {
   value = templatefile(
     "${path.module}/templates/webservers.yml.tftpl",
-    { ipv4_address = data.digitalocean_droplets.webservers.droplets.*.ipv4_address }
+    { ipv4_address = sort(digitalocean_droplet.terra-web-server.*.ipv4_address) }
   )
   sensitive = true
 }
@@ -117,7 +104,7 @@ output "webservers_yml" {
 output "db_yml" {
   value = templatefile(
     "${path.module}/templates/db.yml.tftpl",
-    { db_cluster = data.digitalocean_database_cluster.terra-db-data }
+    { db_cluster = digitalocean_database_cluster.terra-db-1 }
   )
   sensitive = true
 }

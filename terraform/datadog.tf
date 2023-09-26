@@ -12,12 +12,14 @@ resource "datadog_monitor_json" "monitor_json" {
   "query": "\"http.can_connect\".over(\"instance:hexlet_devops_study_website\").by(\"*\").last(2).count_by_status()",
   "message": "Host is unhealthy!",
   "tags": [],
+  "priority": null,
   "options": {
     "thresholds": {
       "critical": 1,
       "warning": 1,
       "ok": 1
     },
+    "new_host_delay": 300,
     "notify_audit": false,
     "notify_no_data": true,
     "no_data_timeframe": 2,
