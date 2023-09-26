@@ -6,6 +6,9 @@ vault_decrypt := --vault-password-file password_file
 vault_file := vault.yml
 
 # Terraform
+terra_format:
+	terraform $(terraform_path) fmt -write
+
 terra_run:
 	terraform $(terraform_path) init
 	terraform $(terraform_path) apply -auto-approve

@@ -27,6 +27,9 @@ make ansible_run
 ### Утилиты
 
 ```bash
+# Автоформатирование конфига Terraform
+make terra_format
+
 # Json c полной конфигурацией inventory
 make inventory_list
 
