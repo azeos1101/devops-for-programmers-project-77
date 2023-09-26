@@ -11,7 +11,7 @@ resource "digitalocean_project" "hexlet-project-3" {
   description = "Hexlet Terraform project"
   purpose     = "Web Application"
   environment = "Production"
-  resources   = flatten([
+  resources = flatten([
     digitalocean_droplet.terra-web-server.*.urn,
     digitalocean_database_cluster.terra-db-1.urn,
     digitalocean_loadbalancer.loadbalancer.urn,
@@ -20,14 +20,14 @@ resource "digitalocean_project" "hexlet-project-3" {
 }
 
 resource "digitalocean_droplet" "terra-web-server" {
-  count = 2
-  image  = "ubuntu-22-04-x64"
-  name   = "terra-web-0${count.index + 1}"
-  region = "ams3"
-  size   = "s-1vcpu-1gb"
-  tags   = ["web"]
-  ssh_keys = [data.digitalocean_ssh_key.main.id]
-  user_data = templatefile("${path.module}/templates/droplet_init.tftpl",{})
+  count     = 2
+  image     = "ubuntu-22-04-x64"
+  name      = "terra-web-0${count.index + 1}"
+  region    = "ams3"
+  size      = "s-1vcpu-1gb"
+  tags      = ["web"]
+  ssh_keys  = [data.digitalocean_ssh_key.main.id]
+  user_data = templatefile("${path.module}/templates/droplet_init.tftpl", {})
 }
 
 resource "digitalocean_database_cluster" "terra-db-1" {
@@ -37,7 +37,7 @@ resource "digitalocean_database_cluster" "terra-db-1" {
   size       = "db-s-1vcpu-1gb"
   region     = "ams3"
   node_count = 1
-  tags   = ["db"]
+  tags       = ["db"]
 }
 
 resource "digitalocean_database_firewall" "terra-db-fw" {
@@ -62,16 +62,16 @@ resource "digitalocean_certificate" "cert" {
 
 resource "digitalocean_record" "CNAME-www" {
   domain = digitalocean_domain.default.name
-  type = "CNAME"
-  name = "www"
-  value = "@"
+  type   = "CNAME"
+  name   = "www"
+  value  = "@"
 }
 
 
 resource "digitalocean_loadbalancer" "loadbalancer" {
-  name   = "lb-1"
-  region = "ams3"
-  droplet_tag = "web"
+  name                   = "lb-1"
+  region                 = "ams3"
+  droplet_tag            = "web"
   redirect_http_to_https = true
 
   forwarding_rule {
@@ -94,7 +94,7 @@ resource "digitalocean_loadbalancer" "loadbalancer" {
 # Export data for external tools
 data "digitalocean_droplets" "webservers" {
   filter {
-    key = "tags"
+    key    = "tags"
     values = ["web"]
   }
 
@@ -102,7 +102,7 @@ data "digitalocean_droplets" "webservers" {
 }
 
 data "digitalocean_database_cluster" "terra-db-data" {
-  name = "terra-db-1"
+  name       = "terra-db-1"
   depends_on = [digitalocean_database_cluster.terra-db-1]
 }
 

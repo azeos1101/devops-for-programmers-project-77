@@ -1,20 +1,20 @@
-variable do_token {
-  type = string
+variable "do_token" {
+  type      = string
   sensitive = true
 }
 
-variable domain_name {
+variable "domain_name" {
   type = string
 }
 
-variable datadog_api_key {
+variable "datadog_api_key" {
   type = string
 }
 
-variable datadog_app_key {
+variable "datadog_app_key" {
   type = string
 
 }
-variable datadog_api_url {
+variable "datadog_api_url" {
   type = string
 }
