@@ -6,30 +6,19 @@ vault_decrypt := --vault-password-file password_file
 vault_file := vault.yml
 
 # Terraform
-terra_encrypt:
-	ansible-vault encrypt $(vault_decrypt) ./terraform/vars.auto.tfvars
-
-terra_decrypt:
-	ansible-vault decrypt $(vault_decrypt) ./terraform/vars.auto.tfvars
-
-terra_plan: terra_decrypt
-	terraform $(terraform_path) plan
-	$(MAKE) terra_encrypt
-
-terra_run: terra_decrypt
+terra_run:
 	terraform $(terraform_path) init
 	terraform $(terraform_path) apply -auto-approve
 	terraform $(terraform_path) output -raw webservers_yml > ./ansible/webservers.yml
 	terraform $(terraform_path) output -raw db_yml > ./ansible/group_vars/webservers/db.yml
 	ansible-vault encrypt --vault-password-file password_file ./ansible/group_vars/webservers/db.yml
-	$(MAKE) terra_encrypt
 
 # Ansible
 # Local tools
 install_deps:
 	ansible-galaxy install -r $(ansible_path)/requirements.yml
 
-init: install_deps
+ansible_init: install_deps
 
 inventory_list:
 	ansible-inventory -i $(inventory_path) $(vault_decrypt) --list
@@ -58,5 +47,8 @@ deploy:
 datadog:
 	ansible-playbook $(playbook_path) -i $(inventory_path) $(vault_decrypt) -t datadog
 
-play:
+ansible_play:
 	ansible-playbook $(playbook_path) -i $(inventory_path) $(vault_decrypt)
+
+ansible_run: ansible_init ansible_play
+
