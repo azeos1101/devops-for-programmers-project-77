@@ -14,7 +14,8 @@ resource "digitalocean_project" "hexlet-project-3" {
   resources   = flatten([
     digitalocean_droplet.terra-web-server.*.urn,
     digitalocean_database_cluster.terra-db-1.urn,
-    digitalocean_loadbalancer.loadbalancer.urn
+    digitalocean_loadbalancer.loadbalancer.urn,
+    digitalocean_domain.default.urn
   ])
 }
 
