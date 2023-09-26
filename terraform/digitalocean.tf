@@ -20,13 +20,13 @@ resource "digitalocean_project" "hexlet-project-3" {
 }
 
 resource "digitalocean_droplet" "terra-web-server" {
-  count     = 2
-  image     = "ubuntu-22-04-x64"
-  name      = "terra-web-0${count.index + 1}"
-  region    = var.do_region
-  size      = "s-1vcpu-1gb"
-  tags      = [var.do_webserver_tag]
-  ssh_keys  = [data.digitalocean_ssh_key.main.id]
+  count    = 2
+  image    = "ubuntu-22-04-x64"
+  name     = "terra-web-0${count.index + 1}"
+  region   = var.do_region
+  size     = "s-1vcpu-1gb"
+  tags     = [var.do_webserver_tag]
+  ssh_keys = [data.digitalocean_ssh_key.main.id]
 }
 
 resource "digitalocean_database_cluster" "terra-db-1" {
