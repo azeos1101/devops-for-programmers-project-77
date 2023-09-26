@@ -3,35 +3,35 @@ ansible_path := ./ansible
 
 # Terrraform
 terra_plan:
-	$(MAKE) -C $(terraform_path) terra_plan
+	make -C $(terraform_path) terra_plan
 
 terra_format:
-	$(MAKE) -C $(terraform_path) terra_format
+	make -C $(terraform_path) terra_format
 
 terra_run:
-	$(MAKE) -C $(terraform_path) terra_run
+	make -C $(terraform_path) terra_run
 
 # Ansible
 
 ansible_run:
-	$(MAKE) -C $(ansible_path) ansible_run
+	make -C $(ansible_path) ansible_run
 
 deploy:
-	$(MAKE) -C $(ansible_path) ansible_deploy
+	make -C $(ansible_path) ansible_deploy
 
 # Secrets
 vault_decrypt:
-	$(MAKE) -C $(ansible_path) vault_decrypt
+	make -C $(ansible_path) vault_decrypt
 
 vault_encrypt:
-	$(MAKE) -C $(ansible_path) vault_encrypt
+	make -C $(ansible_path) vault_encrypt
 
 vault_secrets:
-	$(MAKE) -C $(ansible_path) vault_secrets
+	make -C $(ansible_path) vault_secrets
 
 # Tools
 ping:
-	$(MAKE) -C $(ansible_path) ping
+	make -C $(ansible_path) ping
 
 inventory_list:
-	$(MAKE) -C $(ansible_path) inventory_list
+	make -C $(ansible_path) inventory_list
