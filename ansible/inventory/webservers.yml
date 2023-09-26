@@ -3,15 +3,15 @@ webservers:
   hosts:
   
     web1:
-      ansible_host: 146.190.21.107
-      ansible_user: root
-  
-    web2:
       ansible_host: 164.92.149.243
       ansible_user: root
   
+    web2:
+      ansible_host: 178.62.192.230
+      ansible_user: root
+  
     web3:
-      ansible_host: 167.99.43.72
+      ansible_host: 178.62.208.23
       ansible_user: root
   
 
